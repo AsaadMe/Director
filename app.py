@@ -1,28 +1,31 @@
 from flask import Flask , request, render_template,redirect,url_for,jsonify
-import sys
-import subprocess
 import json
 from threading import Thread
+import youtube_dl
 
 app = Flask(__name__)
 
-
+def hook(d):
+    filename = d['filename'].replace("static/","").strip()
+    if d['status'] == 'finished':
+        with open('static/result.txt','w') as file:
+            file.write("{'current': 99.99, 'total': 100, 'status':'" + filename + "','result': 42 , 'finished':'True'}")
+    if d['status'] == 'downloading':
+        percent = d['_percent_str'].replace('%','').strip()
+        with open('static/result.txt','w') as file:
+            file.write("{'current':" + percent + ", 'total': 100, 'status':'" + filename + "','result': 42}")
 
 #Long_wrok
 def work(plink):
 
-    res=""
-    title=""
-    
-    title = subprocess.check_output(["youtube-dl","--get-filename", plink])
-    title = str(title).replace("b'","").replace("\\n'","")
-    res = subprocess.check_output(["youtube-dl","-o","static/"+title, plink])    
+    ydl_opts = {
+    'outtmpl': 'static/%(title)s.%(ext)s',
+    'progress_hooks': [hook]
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([plink])
    
-    #print("!!!!!!!!!!!!!!",res,"TITLE:",title)
        
-    with open('static/result.txt','w') as file:
-        file.write("{'current': 99.99, 'total': 100, 'status':'"+title+"','result': 42}")
-
 
 
 @app.route('/' , methods=['GET', 'POST'])

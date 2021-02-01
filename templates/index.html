@@ -85,19 +85,14 @@
                 // update UI
                 percent = parseInt(data['current'] * 100 / data['total']);				
                 nanobar.go(percent);
-				
-                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
-                    if ('result' in data) {
+				$('#title').text(data['status']);
+                if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS' && 'finished' in data) {  
                         // show result
 						var vidhtml = "<video controls='controls' width='350' preload='metadata'><source id='vidframe' src='/static/"+data['status']+"#t=0.1' type='video/mp4'>Sorry, your browser doesnt support embedded videos.</video>"
-						$('#title').text(data['status']);
+						
 						$('#vidframe').html(vidhtml);
 						$(status_div.childNodes[1]).text('');
-                    }
-                    else {
-                        // something unexpected happened
-                        $(status_div.childNodes[3]).text('Result: ' + data['state']);
-                    }
+                    
                 }
                 else {
                     // rerun in 2 seconds
