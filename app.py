@@ -53,8 +53,8 @@ def stream():
         plink = request.form['vidurl']
 
         data = History(spotify_uri=str(plink))
-            db.session.add(data)
-            db.session.commit()
+        db.session.add(data)
+        db.session.commit()
 
         thread = Thread(target=work,args=(plink,))
         thread.daemon = True
