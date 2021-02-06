@@ -1,9 +1,23 @@
 from flask import Flask , request, render_template,redirect,url_for,jsonify
+from flask_sqlalchemy import SQLAlchemy
 import json
 from threading import Thread
 import youtube_dl
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class History(db.Model):
+    __tablename__ = 'history'
+    id = db.Column(db.Integer, primary_key=True)
+    spotify_uri = db.Column(db.String())    
+    
+    def __init__(self, spotify_uri):
+        self.spotify_uri = spotify_uri
+
 
 def hook(d):
     filename = d['filename'].replace("static/","").strip()
@@ -37,6 +51,11 @@ def stream():
     
     if request.method == 'POST':
         plink = request.form['vidurl']
+
+        data = History(spotify_uri=str(plink))
+            db.session.add(data)
+            db.session.commit()
+
         thread = Thread(target=work,args=(plink,))
         thread.daemon = True
         thread.start()
