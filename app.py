@@ -14,10 +14,10 @@ db = SQLAlchemy(app)
 class History(db.Model):
     __tablename__ = 'history'
     id = db.Column(db.Integer, primary_key=True)
-    spotify_uri = db.Column(db.String())    
+    url_history = db.Column(db.String())    
     
-    def __init__(self, spotify_uri):
-        self.spotify_uri = spotify_uri
+    def __init__(self, url_history):
+        self.url_history = url_history
 
 
 def hook(d):
@@ -53,7 +53,7 @@ def stream():
     if request.method == 'POST':
         plink = request.form['vidurl']
 
-        data = History(spotify_uri=str(plink))
+        data = History(url_history=str(plink))
         db.session.add(data)
         db.session.commit()
 
