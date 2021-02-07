@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 def hook(d):
-    filename = d['filename'].replace("static/","").strip()
+    filename = d['filename'].replace("static/","").replace("'","").strip()
     if d['status'] == 'finished':
         size = d["_total_bytes_str"]
         strtmp = f", 'size': '{size}'"
