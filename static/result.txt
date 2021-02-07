@@ -1,1 +1,0 @@
-{'current': 99.99, 'total': 100, 'status':'file_example_MP4_640_3MG.mp4','result': 42 , 'finished':'True'}

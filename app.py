@@ -8,16 +8,15 @@ app = Flask(__name__)
 
 
 def hook(d):
-    filename = d['filename'].replace("static/","").replace("'","").strip()
+    filename = d['filename'].replace("static/","").strip()
     if d['status'] == 'finished':
         size = d["_total_bytes_str"]
-        strtmp = f", 'size': '{size}'"
         with open('static/result.txt','w') as file:
-            file.write("{'current': 99.99, 'total': 100, 'status':'" + filename + "','result': 42 , 'finished':'True'" + strtmp +"}")
+            file.write(f"""{{"current": 99.99, "total": 100, "status":"{filename}","result": 42 , "finished":"True", "size":"{size}"}}""")
     if d['status'] == 'downloading':
         percent = d['_percent_str'].replace('%','').strip()
         with open('static/result.txt','w') as file:
-            file.write("{'current':" + percent + ", 'total': 100, 'status':'" + filename + "','result': 42}")
+            file.write(f"""{{"current":"{percent}", "total": 100, "status":"{filename}","result": 42}}""")
 
 #Long_wrok
 def work(plink):
@@ -54,7 +53,7 @@ def taskstatus():
     with open('static/result.txt','r') as file:
         data = file.read()
         if data !="":
-            response = json.loads(data.replace("'","\""))
+            response = json.loads(data)
             return response
         else:
             return {
