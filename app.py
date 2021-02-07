@@ -3,21 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 from threading import Thread
 import youtube_dl
-import os
 
 app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-
-class History(db.Model):
-    __tablename__ = 'history'
-    id = db.Column(db.Integer, primary_key=True)
-    url_history = db.Column(db.String())    
-    
-    def __init__(self, url_history):
-        self.url_history = url_history
 
 
 def hook(d):
@@ -42,20 +29,14 @@ def work(plink):
    
        
 
-
 @app.route('/' , methods=['GET', 'POST'])
 def stream():
 
     with open('static/result.txt','w') as file:
         file.write("")
-        
-    
+            
     if request.method == 'POST':
         plink = request.form['vidurl']
-
-        data = History(url_history=str(plink))
-        db.session.add(data)
-        db.session.commit()
 
         thread = Thread(target=work,args=(plink,))
         thread.daemon = True
