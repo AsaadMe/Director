@@ -11,8 +11,9 @@ def hook(d):
     filename = d['filename'].replace("static/","").strip()
     if d['status'] == 'finished':
         size = d["_total_bytes_str"]
+        strtmp = f", 'size': '{size}'"
         with open('static/result.txt','w') as file:
-            file.write("{'current': 99.99, 'total': 100, 'status':'" + filename + "','result': 42 , 'size':'" + size + "','finished':'True'}")
+            file.write("{'current': 99.99, 'total': 100, 'status':'" + filename + "','result': 42 , 'finished':'True'" + strtmp +"}")
     if d['status'] == 'downloading':
         percent = d['_percent_str'].replace('%','').strip()
         with open('static/result.txt','w') as file:
