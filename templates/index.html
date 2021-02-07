@@ -89,8 +89,9 @@
 				$('#title').text(data['status']);
                 if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS' && 'finished' in data) {  
                         // show result
-						var vidhtml = "<video controls='controls' width='350' preload='metadata'><source id='vidframe' src='/static/"+data['status']+"#t=0.1' type='video/mp4'>Sorry, your browser doesnt support embedded videos.</video>"
-                        var downbtn = "<a download href='/static/"+data['status']+"'> Download </a>"
+                        var filename = data['status'].replace(/'/g, "&apos;");
+						var vidhtml = "<video controls='controls' width='350' preload='metadata'><source id='vidframe' src='/static/"+filename+"#t=0.1' type='video/mp4'>Sorry, your browser doesnt support embedded videos.</video>";
+                        var downbtn = "<a download href='/static/"+filename+"'> Download </a>";
                         $('#title').text(data['status']+" / "+data['size']);
 						$('#vidframe').html(vidhtml);
                         $('#downloadbtn').html(downbtn);

@@ -23,6 +23,9 @@ def work(plink):
 
     ydl_opts = {
     'outtmpl': 'static/%(title)s.%(ext)s',
+    'format':'22/best',
+    'restrict-filenames':True,
+    'noplaylist': True,
     'progress_hooks': [hook]
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
