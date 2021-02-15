@@ -45,7 +45,7 @@
 	<script>
 		
 		function start_long_task() {
-            var socket = io();
+            var socket = io().connect('https://director-stream.herokuapp.com/');
 
             // add task status elements
             div = $('<div class="progress"><div></div><div>PENDING</div></div><hr>');
