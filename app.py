@@ -17,7 +17,7 @@ def handle_json(message):
     global percent
     global filename
     global size
-
+    
     if float(percent) > 99:
         resp = {"current": 99.99, "total": 100, "status":filename, "result":42, "finished":"True", "size":size}
         emit('response',resp)
@@ -67,4 +67,4 @@ def stream():
 
  
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app,debug=True)

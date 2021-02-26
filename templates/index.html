@@ -44,8 +44,8 @@
 
 	<script>
 		
+        var socket = io();
 		function start_long_task() {
-            var socket = io();
 
             // add task status elements
             div = $('<div class="progress"><div></div><div>PENDING</div></div><hr>');
@@ -64,24 +64,30 @@
                 url: '/',
 				data: {'vidurl': $('#vidurl').val()},
                 success: function(data, status, request) {
-                    update_progress(socket, nanobar, div[0]);
+                    update_progress(nanobar, div[0]);
                 },
                 error: function() {
                     alert('Unexpected error');
                 }
             });
         }
-        function update_progress(socket, nanobar, status_div) {
+        
+        var data = {};
+        socket.on('response', function(data_res) {
+            data = data_res;
+        });
+
+        function update_progress(nanobar, status_div) {
             // send request to socketio -> get data
             
-            socket.emit('bg-job',{'refresh':"true"});
-            socket.on('response', function(data) {
-            
+            socket.emit('bg-job',{'refresh':"true"});            
             
                 // update UI
+                if ('current' in data){
                 percent = parseInt(data['current'] * 100 / data['total']);				
                 nanobar.go(percent);
 				$('#title').text(data['status']);
+                }
                 if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS' && 'finished' in data) {  
                         // show result
                         var filename = data['status'].replace(/'/g, "&apos;");
@@ -96,11 +102,11 @@
                 else {
                     // rerun in 2 seconds
                     setTimeout(function() {
-                        update_progress(socket, nanobar, status_div);
+                        update_progress(nanobar, status_div);
                     }, 2000);
                 }
             
-            });}
+            }
 		
         $(function() {
             $('#start-bg-job').click(start_long_task);
