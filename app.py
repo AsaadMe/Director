@@ -8,34 +8,39 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("secret")
 socketio = SocketIO(app)
 
-percent = "0"
-filename = ""
-size = ""
+user_sess = {}
 
 @socketio.on('bg-job')
 def handle_json(message):
-    global percent
-    global filename
-    global size
-    
-    if float(percent) > 99:
-        resp = {"current": 99.99, "total": 100, "status":filename, "result":42, "finished":"True", "size":size}
-        emit('response',resp)
-    else:
-        resp = {"current": percent, "total": 100, "status":filename, "result":42}
-        emit('response',resp)
+
+    if (vidurl := message.get('vidurl')) != None:
+
+        with youtube_dl.YoutubeDL({'outtmpl': '%(title)s.%(ext)s'}) as ydl:
+            filename = ydl.extract_info(vidurl, download=False)['title']
+
+        if filename in user_sess:
+            ext = '.' + user_sess[filename]['ext']
+            if float(user_sess[filename]['percent']) > 99:
+                resp = {"current": 99.99, "total": 100, "status":filename + ext, "result":42, "finished":"True", "size":user_sess[filename]['size']}
+                emit('response',resp)
+            else:
+                resp = {"current": user_sess[filename]['percent'], "total": 100, "status":filename + ext, "result":42}
+                emit('response',resp)
 
 def hook(d):
-    global filename 
-    filename = d['filename'].replace("static/","").strip()
-    if d['status'] == 'finished':
-        global size 
-        size = d["_total_bytes_str"]
 
-    if d['status'] == 'downloading':
-        global percent 
-        percent = d['_percent_str'].replace('%','').strip()
+    global user_sess 
+    filename = d['filename'].replace("static/","").strip().split('.')[0]
+    if filename not in user_sess:
+        user_sess[filename] = {'ext':'', 'size':0, 'percent':0}
 
+    user_sess[filename]['ext'] = d['filename'].replace("static/","").strip().split('.')[1]
+
+    if d['status'] == 'finished': 
+        user_sess[filename]['size'] = d["_total_bytes_str"]
+
+    if d['status'] == 'downloading': 
+        user_sess[filename]['percent'] = d['_percent_str'].replace('%','').strip()
 
 #Long_wrok
 def work(plink):
@@ -53,8 +58,8 @@ def work(plink):
        
 
 @app.route('/' , methods=['GET', 'POST'])
-def stream():
-            
+def stream():  
+          
     if request.method == 'POST':
         plink = request.form['vidurl']
 
